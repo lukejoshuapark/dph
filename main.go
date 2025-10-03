@@ -13,8 +13,6 @@ import (
 	"github.com/lukejoshuapark/dph/util"
 )
 
-const version = "0.1.0"
-
 var filePath string
 var dryRun bool
 
@@ -34,8 +32,6 @@ func main() {
 }
 
 func run(ctx context.Context) error {
-	fmt.Printf("🐗 dph v%s\n", version)
-
 	flag.Parse()
 
 	cfg, err := config.LoadFromEnvironment()

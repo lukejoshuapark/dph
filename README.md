@@ -48,7 +48,7 @@ The file schema used to define flags is very simple.
 ```yml
 flags:
   FirstFlagKey:
-    Description: The key of this flag is FirstFlagKey.
+    description: The key of this flag is FirstFlagKey.
   SecondFlagKey:
-    Description: The key of this flag is SecondFlagKey.
+    description: The key of this flag is SecondFlagKey.
 ```

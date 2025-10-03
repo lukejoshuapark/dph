@@ -1,0 +1,63 @@
+name: Release
+on:
+  release:
+    types: [created]
+jobs:
+  build:
+    name: Build and Upload Binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            ext: tar.gz
+          - goos: linux
+            goarch: arm64
+            ext: tar.gz
+          - goos: darwin
+            goarch: amd64
+            ext: tar.gz
+          - goos: darwin
+            goarch: arm64
+            ext: tar.gz
+          - goos: windows
+            goarch: amd64
+            ext: zip
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Build binary
+        run: |
+          mkdir -p build
+          output_name="dph"
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            output_name="dph.exe"
+          fi
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o build/$output_name .
+
+      - name: Package artifact
+        run: |
+          cd build
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            archive="dph-${{ github.ref_name }}-${{ matrix.goos }}-${{ matrix.goarch }}.zip"
+            zip "../$archive" dph.exe
+          else
+            archive="dph-${{ github.ref_name }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz"
+            tar -czf "../$archive" dph
+          fi
+          cd ..
+          echo "ASSET=$archive" >> $GITHUB_ENV
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ASSET }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
