@@ -17,8 +17,8 @@ func Parallel[T any](inputs []T, f func(T) error) error {
 
 	for _, input := range inputs {
 		go func(input T) {
+			defer wg.Done()
 			errc <- f(input)
-			wg.Done()
 		}(input)
 	}
 
