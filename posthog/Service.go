@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/lukejoshuapark/dph/util"
 )
 
 type Service interface {
@@ -97,11 +99,19 @@ func (s *impl) GetFlagByKey(ctx context.Context, projectId string, key string) (
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	if len(page.Results) != 1 {
+	result, err := util.Single(page.Results, func(model *FlagResponseModel) bool {
+		return model.Key == key
+	})
+
+	if err == util.ErrTooManyElements {
+		return nil, fmt.Errorf("multiple flags found with key %s", key)
+	}
+
+	if err == util.ErrNoElementFound {
 		return nil, nil
 	}
 
-	return page.Results[0], nil
+	return result, nil
 }
 
 func (s *impl) CreateFlag(ctx context.Context, projectId string, requestModel *CreateFlagRequestModel) error {
