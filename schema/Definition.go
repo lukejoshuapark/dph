@@ -29,3 +29,18 @@ func LoadFromFile(file string) (*Definition, error) {
 
 	return definition, nil
 }
+
+func PersistToFile(file string, definition *Definition) error {
+	f, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	encoder := yaml.NewEncoder(f)
+	if err := encoder.Encode(definition); err != nil {
+		return err
+	}
+
+	return nil
+}

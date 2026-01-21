@@ -1,5 +1,5 @@
 {
-	"image": "ghcr.io/lukejoshuapark/instant-coffee:0.8.2",
+	"image": "ghcr.io/lukejoshuapark/instant-coffee:0.9.1",
 	"runArgs": [ "--env-file", ".devcontainer/.env" ],
 	"mounts": [
 		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"

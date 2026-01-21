@@ -15,10 +15,12 @@ import (
 
 var filePath string
 var dryRun bool
+var reverse bool
 
 func init() {
 	flag.StringVar(&filePath, "f", "flags.yml", "Path to the flag definition file")
 	flag.BoolVar(&dryRun, "d", false, "If set, will not make any changes to PostHog")
+	flag.BoolVar(&reverse, "r", false, "If set, will operate in reverse - the flags currently in PostHog will be populated in the specified flag definition file")
 }
 
 func main() {
@@ -37,6 +39,14 @@ func run(ctx context.Context) error {
 	cfg, err := config.LoadFromEnvironment()
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	if reverse {
+		if err := application.PersistFlagsToFile(ctx, cfg, filePath); err != nil {
+			return fmt.Errorf("failed to persist flags to file: %w", err)
+		}
+
+		return nil
 	}
 
 	definition, err := schema.LoadFromFile(filePath)
