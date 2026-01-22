@@ -5,12 +5,13 @@ import (
 	"fmt"
 
 	"github.com/lukejoshuapark/dph/config"
+	"github.com/lukejoshuapark/dph/notification"
 	"github.com/lukejoshuapark/dph/posthog"
 	"github.com/lukejoshuapark/dph/schema"
 	"github.com/lukejoshuapark/dph/util"
 )
 
-func DeleteSurplusFlags(ctx context.Context, posthogService posthog.Service, cfg *config.Config, flags []*schema.Flag, dryRun bool) error {
+func DeleteSurplusFlags(ctx context.Context, notificationService notification.Service, posthogService posthog.Service, cfg *config.Config, flags []*schema.Flag, dryRun bool) error {
 	currentFlags, err := posthogService.ListFlags(ctx, cfg.ProjectId)
 	if err != nil {
 		return fmt.Errorf("failed to list flags: %w", err)
@@ -45,6 +46,10 @@ func DeleteSurplusFlags(ctx context.Context, posthogService posthog.Service, cfg
 
 		if err := posthogService.PatchFlag(ctx, cfg.ProjectId, flag.Id, requestModel); err != nil {
 			return fmt.Errorf("failed to delete flag with key '%s' (ID: %d): %w", key, flag.Id, err)
+		}
+
+		if err := notificationService.PushDeleteNotification(key, flag.Description); err != nil {
+			fmt.Printf("⚠️ Failed to send delete notification for flag with key '%s': %v\n", key, err)
 		}
 
 		fmt.Printf("☠️ Deleted flag with key '%s' (ID: %d)\n", key, flag.Id)

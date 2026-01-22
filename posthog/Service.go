@@ -14,7 +14,7 @@ import (
 type Service interface {
 	ListFlags(ctx context.Context, projectId string) ([]*FlagResponseModel, error)
 	GetFlagByKey(ctx context.Context, projectId string, key string) (*FlagResponseModel, error)
-	CreateFlag(ctx context.Context, projectId string, requestModel *CreateFlagRequestModel) error
+	CreateFlag(ctx context.Context, projectId string, requestModel *CreateFlagRequestModel) (int, error)
 	PatchFlag(ctx context.Context, projectId string, id int, requestModel *PatchFlagRequestModel) error
 }
 
@@ -114,24 +114,29 @@ func (s *impl) GetFlagByKey(ctx context.Context, projectId string, key string) (
 	return result, nil
 }
 
-func (s *impl) CreateFlag(ctx context.Context, projectId string, requestModel *CreateFlagRequestModel) error {
+func (s *impl) CreateFlag(ctx context.Context, projectId string, requestModel *CreateFlagRequestModel) (int, error) {
 	url := fmt.Sprintf("%s/api/projects/%s/feature_flags", s.baseUrl, projectId)
 	req, err := prepareRequestWithRequestModel(ctx, http.MethodPost, url, s.apiKey, requestModel)
 	if err != nil {
-		return fmt.Errorf("failed to prepare request: %w", err)
+		return 0, fmt.Errorf("failed to prepare request: %w", err)
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to complete http request: %w", err)
+		return 0, fmt.Errorf("failed to complete http request: %w", err)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusCreated {
-		return errorForFailureResponse(res)
+		return 0, errorForFailureResponse(res)
 	}
 
-	return nil
+	responseModel, err := decodeResponseModel[CreateFlagResponseModel](res)
+	if err != nil {
+		return 0, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return responseModel.Id, nil
 }
 
 func (s *impl) PatchFlag(ctx context.Context, projectId string, id int, requestModel *PatchFlagRequestModel) error {

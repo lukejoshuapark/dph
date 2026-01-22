@@ -40,7 +40,8 @@ The following environment variables are used but not all are required.
 |----|--------|-----|
 |DPH_PROJECT_ID|Yes|The PostHog Project ID of the project to manage feature flags in.|
 |DPH_PERSONAL_API_KEY|Yes|A PostHog personal API key that has full feature flag scopes.|
-|DPH_API_BASE_URL|No|The base URL of the PostHog API.  The default is `https://us.posthog.com`|
+|DPH_API_BASE_URL|No|The base URL of the PostHog API.  The default is `https://us.posthog.com`.|
+|DPH_GOOGLE_CHAT_WEBHOOK_URL|No|A webhook URL for a Google Chat space to send notifications to.  Notifications will always be sent if this is present.|
 
 ## File Schema
 
