@@ -38,6 +38,7 @@ The following environment variables are used but not all are required.
 
 |Name|Required|Notes|
 |----|--------|-----|
+|DPH_ORGANIZATION_ID|Yes|The PostHog Organization ID that the project belongs to.|
 |DPH_PROJECT_ID|Yes|The PostHog Project ID of the project to manage feature flags in.|
 |DPH_PERSONAL_API_KEY|Yes|A PostHog personal API key that has full feature flag scopes.|
 |DPH_API_BASE_URL|No|The base URL of the PostHog API.  The default is `https://us.posthog.com`.|
@@ -53,4 +54,10 @@ flags:
     description: The key of this flag is FirstFlagKey.
   SecondFlagKey:
     description: The key of this flag is SecondFlagKey.
+    exclude:
+      - Production
 ```
+
+The `exclude` property is a list of project names.  If the name of the PostHog project specified using `DPH_PROJECT_ID`
+matches one of the names in the exclude list, `dph` determines that this flag should not exist for the project, and will
+not create it/delete it if it exists.

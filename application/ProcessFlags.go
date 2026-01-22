@@ -20,11 +20,21 @@ func ProcessFlags(ctx context.Context, cfg *config.Config, flags []*schema.Flag,
 	}
 
 	posthogService := posthog.NewService(cfg.ApiBaseUrl, cfg.PersonalApiKey)
-	if err := DeleteSurplusFlags(ctx, notificationService, posthogService, cfg, flags, dryRun); err != nil {
+	project, err := posthogService.GetProjectById(ctx, cfg.OrganizationId, cfg.ProjectId)
+	if err != nil {
+		return fmt.Errorf("failed to get project: %w", err)
+	}
+
+	projectName := project.Name
+	includedFlags := util.Filter(flags, func(f *schema.Flag) bool {
+		return !util.Contains(f.Exclude, projectName)
+	})
+
+	if err := DeleteSurplusFlags(ctx, notificationService, posthogService, cfg, includedFlags, dryRun); err != nil {
 		return fmt.Errorf("failed to delete surplus flags: %w", err)
 	}
 
-	return util.Parallel(flags, func(flag *schema.Flag) error {
+	return util.Parallel(includedFlags, func(flag *schema.Flag) error {
 		return ProcessFlag(ctx, notificationService, posthogService, cfg, flag, dryRun)
 	})
 }

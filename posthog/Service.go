@@ -12,6 +12,8 @@ import (
 )
 
 type Service interface {
+	GetProjectById(ctx context.Context, organizationId string, projectId string) (*ProjectResponseModel, error)
+
 	ListFlags(ctx context.Context, projectId string) ([]*FlagResponseModel, error)
 	GetFlagByKey(ctx context.Context, projectId string, key string) (*FlagResponseModel, error)
 	CreateFlag(ctx context.Context, projectId string, requestModel *CreateFlagRequestModel) (int, error)
@@ -31,6 +33,31 @@ type impl struct {
 }
 
 var _ Service = (*impl)(nil)
+
+func (s *impl) GetProjectById(ctx context.Context, organizationId string, projectId string) (*ProjectResponseModel, error) {
+	url := fmt.Sprintf("%s/api/organizations/%s/projects/%s", s.baseUrl, organizationId, projectId)
+	req, err := prepareRequest(ctx, http.MethodGet, url, s.apiKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare request: %w", err)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to complete http request: %w", err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errorForFailureResponse(res)
+	}
+
+	responseModel, err := decodeResponseModel[ProjectResponseModel](res)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return responseModel, nil
+}
 
 func (s *impl) ListFlags(ctx context.Context, projectId string) ([]*FlagResponseModel, error) {
 	flags := make([]*FlagResponseModel, 0)
