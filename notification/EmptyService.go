@@ -8,7 +8,7 @@ func NewEmptyService() *EmptyService {
 	return &EmptyService{}
 }
 
-func (s *EmptyService) PushCreateNotification(key string, description string, flagURL string) error {
+func (s *EmptyService) PushCreateNotification(key string, description string, flagURL string, documentationURL *string) error {
 	return nil
 }
 

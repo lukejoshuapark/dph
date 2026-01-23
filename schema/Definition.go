@@ -11,8 +11,9 @@ type Definition struct {
 }
 
 type FlagDefinition struct {
-	Description string   `yaml:"description"`
-	Exclude     []string `yaml:"exclude,omitempty"`
+	Description      string   `yaml:"description"`
+	DocumentationURL string   `yaml:"documentationUrl,omitempty"`
+	Exclude          []string `yaml:"exclude,omitempty"`
 }
 
 func LoadFromFile(file string) (*Definition, error) {

@@ -26,15 +26,15 @@ func NewGoogleChatService(webhookURL string) *GoogleChatService {
 
 var _ Service = (*GoogleChatService)(nil)
 
-func (s *GoogleChatService) PushCreateNotification(key string, description string, flagURL string) error {
-	return s.pushNotification("✨", key, "Feature Flag Created", description, &flagURL)
+func (s *GoogleChatService) PushCreateNotification(key string, description string, flagURL string, documentationURL *string) error {
+	return s.pushNotification(key, "🚀 Feature Flag Ready", description, &flagURL, documentationURL)
 }
 
 func (s *GoogleChatService) PushDeleteNotification(key string, description string) error {
-	return s.pushNotification("🗑️", key, "Feature Flag Removed", description, nil)
+	return s.pushNotification(key, "🗑️ Feature Flag Removed", description, nil, nil)
 }
 
-func (s *GoogleChatService) pushNotification(emoji string, key string, header string, description string, flagURL *string) error {
+func (s *GoogleChatService) pushNotification(key string, header string, description string, flagURL *string, documentationURL *string) error {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
@@ -44,6 +44,7 @@ func (s *GoogleChatService) pushNotification(emoji string, key string, header st
 	}
 
 	accessoryWidgets := []googleChatRequestModelAccessoryWidget{}
+
 	if flagURL != nil {
 		accessoryWidgets = append(accessoryWidgets, googleChatRequestModelAccessoryWidget{
 			ButtonList: googleChatRequestModelButtonList{
@@ -66,12 +67,34 @@ func (s *GoogleChatService) pushNotification(emoji string, key string, header st
 		})
 	}
 
+	if documentationURL != nil {
+		accessoryWidgets = append(accessoryWidgets, googleChatRequestModelAccessoryWidget{
+			ButtonList: googleChatRequestModelButtonList{
+				Buttons: []googleChatRequestModelButton{
+					{
+						Text: "View Documentation",
+						Icon: googleChatRequestModelButtonIcon{
+							MaterialIcon: googleChatRequestModelButtonMaterialIcon{
+								Name: "auto_stories",
+							},
+						},
+						OnClick: googleChatRequestModelButtonOnClick{
+							OpenLink: googleChatRequestModelButtonOpenLink{
+								Url: *documentationURL,
+							},
+						},
+					},
+				},
+			},
+		})
+	}
+
 	requestModel := &googleChatRequestModel{
 		CardContainers: []googleChatRequestModelCardContainer{
 			{
 				Card: googleChatRequestModelCard{
 					Header: googleChatRequestModelHeader{
-						Title: fmt.Sprintf("%s %s", emoji, header),
+						Title: header,
 					},
 					Sections: []googleChatRequestModelSection{
 						{

@@ -43,7 +43,7 @@ func createNewFlag(ctx context.Context, notificationService notification.Service
 
 	flagUrl := fmt.Sprintf("%s/project/%s/feature_flags/%d", cfg.ApiBaseUrl, cfg.ProjectId, flagId)
 
-	if err := notificationService.PushCreateNotification(flag.Key, flag.Description, flagUrl); err != nil {
+	if err := notificationService.PushCreateNotification(flag.Key, flag.Description, flagUrl, &flag.DocumentationURL); err != nil {
 		fmt.Printf("⚠️ Failed to send create notification for flag '%s': %v\n", flag.Key, err)
 	}
 
