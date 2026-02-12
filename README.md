@@ -24,13 +24,14 @@ Basic usage is as simple as:
 dph
 ```
 
-Three flags are supported:
+Four flags are supported:
 
 |Name|Required|Notes|
 |----|--------|-----|
 |f   |No      |The file to load flag definitions from.  The default is `flags.yml`.|
 |d   |No      |Whether to do a dry run i.e. no actual mutations in PostHog.  The default is `false`.|
 |r   |No      |Whether to operate in reverse - when enabled, flags that exist in PostHog will be populated in to the flag definition file.|
+|s   |No      |Whether to operate in "safe" mode - when enabled, flags that exist in PostHog that don't exist in the flag definition file will _not_ be deleted.|
 
 ## Environment Variables
 

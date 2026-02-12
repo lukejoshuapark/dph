@@ -16,11 +16,13 @@ import (
 var filePath string
 var dryRun bool
 var reverse bool
+var safe bool
 
 func init() {
 	flag.StringVar(&filePath, "f", "flags.yml", "Path to the flag definition file")
 	flag.BoolVar(&dryRun, "d", false, "If set, will not make any changes to PostHog")
 	flag.BoolVar(&reverse, "r", false, "If set, will operate in reverse - the flags currently in PostHog will be populated in the specified flag definition file")
+	flag.BoolVar(&safe, "s", false, "If set, will not delete any flags in PostHog that are not present in the flag definition file")
 }
 
 func main() {
@@ -58,5 +60,5 @@ func run(ctx context.Context) error {
 		return schema.FlagFromDefinition(key, value)
 	})
 
-	return application.ProcessFlags(ctx, cfg, flags, dryRun)
+	return application.ProcessFlags(ctx, cfg, flags, dryRun, safe)
 }

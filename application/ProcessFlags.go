@@ -11,7 +11,7 @@ import (
 	"github.com/lukejoshuapark/dph/util"
 )
 
-func ProcessFlags(ctx context.Context, cfg *config.Config, flags []*schema.Flag, dryRun bool) error {
+func ProcessFlags(ctx context.Context, cfg *config.Config, flags []*schema.Flag, dryRun bool, safe bool) error {
 	var notificationService notification.Service
 	if cfg.GoogleChatWebhookUrl != "" {
 		notificationService = notification.NewGoogleChatService(cfg.GoogleChatWebhookUrl)
@@ -30,8 +30,12 @@ func ProcessFlags(ctx context.Context, cfg *config.Config, flags []*schema.Flag,
 		return !util.Contains(f.Exclude, projectName)
 	})
 
-	if err := DeleteSurplusFlags(ctx, notificationService, posthogService, cfg, includedFlags, dryRun); err != nil {
-		return fmt.Errorf("failed to delete surplus flags: %w", err)
+	if !safe {
+		if err := DeleteSurplusFlags(ctx, notificationService, posthogService, cfg, includedFlags, dryRun); err != nil {
+			return fmt.Errorf("failed to delete surplus flags: %w", err)
+		}
+	} else {
+		fmt.Printf("⚠️ Safe mode is enabled, skipped checking if any flags need to be deleted\n")
 	}
 
 	return util.Parallel(includedFlags, func(flag *schema.Flag) error {
