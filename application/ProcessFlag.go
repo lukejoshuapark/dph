@@ -30,11 +30,7 @@ func createNewFlag(ctx context.Context, notificationService notification.Service
 		return nil
 	}
 
-	requestModel := &posthog.CreateFlagRequestModel{
-		Key:         flag.Key,
-		Description: flag.Description,
-		Active:      false,
-	}
+	requestModel := posthog.NewCreateFlagRequestModel(flag.Key, flag.Description)
 
 	flagId, err := posthogService.CreateFlag(ctx, cfg.ProjectId, requestModel)
 	if err != nil {
