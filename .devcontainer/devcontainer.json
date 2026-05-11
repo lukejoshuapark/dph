@@ -1,5 +1,5 @@
 {
-	"image": "ghcr.io/lukejoshuapark/instant-coffee:0.9.1",
+	"image": "ghcr.io/lukejoshuapark/instant-coffee:0.10.3",
 	"runArgs": [ "--env-file", ".devcontainer/.env" ],
 	"mounts": [
 		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
@@ -17,8 +17,7 @@
 				"vadimcn.vscode-lldb"
 			],
 			"settings": {
-				"javascript.preferences.quoteStyle": "double",
-				"typescript.preferences.quoteStyle": "double",
+				"js/ts.preferences.quoteStyle": "double",
 				"editor.tabSize": 4,
 				"editor.insertSpaces": false,
 				"editor.detectIndentation": false,

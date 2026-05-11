@@ -26,7 +26,8 @@ func NewCreateFlagRequestModel(key string, description string) *CreateFlagReques
 		Filters: CreateFlagRequestModelFilters{
 			Groups: []CreateFlagRequestModelFiltersGroup{
 				{
-					Properties: []any{},
+					Properties:        []any{},
+					RolloutPercentage: 100,
 				},
 			},
 			Payloads: map[string]any{},
